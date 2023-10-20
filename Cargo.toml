@@ -2,5 +2,13 @@
 name = "bump-version"
 version = "0.1.0"
 edition = "2021"
+description = "A tool which updates files in your project with the current version number."
+license-file = "LICENSE"
+repository = "https://github.com/tomphp/bump-version"
+keywords = ["build", "release", "versioning", "automation"]
+categories = ["command-line-utilities", "development-tools"]
 
 [dependencies]
+
+[dev-dependencies]
+assert_cmd = "2.0.12"
