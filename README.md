@@ -28,7 +28,7 @@ locations:
 
 Running:
 
-```shell, script()
+```shell, script(expected_exit_code=0)
 bump-version bump 2.3.16
 ```
 
@@ -79,4 +79,24 @@ bump-version --version
 
 ```text, verify()
 bump-version 0.1.0
+```
+
+## Configuration
+
+When running the `bump` command, a configuration file is required.
+By default, `bump-version` looks for a file named `bump-version.yml` in the current directory.
+
+### Missing Configuration
+
+If you run `bump-version bump` without a configuration file present like this:
+
+```shell, script(expected_exit_code=1)
+rm -f bump-version.yml # TODO extract section into another doc and remove this
+bump-version bump 1.2.3
+```
+
+Then you will see the following error:
+
+```text, verify(stream=stderr)
+ERROR: No bump-version.yml file found.
 ```

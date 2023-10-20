@@ -1,3 +1,5 @@
+use std::path::Path;
+use std::process;
 use clap::{Parser, Subcommand};
 
 #[derive(Parser)]
@@ -20,7 +22,10 @@ fn main() {
 
     match &cli.command {
         Commands::Bump { version: _ } => {
-            println!("TODO")
+            if !Path::new("bump-version.yml").exists() {
+                eprintln!("ERROR: No bump-version.yml file found.");
+                process::exit(1);
+            }
         }
     }
 }
