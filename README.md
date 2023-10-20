@@ -2,6 +2,11 @@
 
 A tool which updates files in your project with the current version number.
 
+> ⚠️ **CURRENT STATUS** ⚠️
+>
+> This project is in the early development stage. It is currently not functional or useful.
+> Please check back soon.
+
 ## Example
 
 Given a file `README.md` which contains:
