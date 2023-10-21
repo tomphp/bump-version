@@ -11,7 +11,9 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
+    /// Updates the version in all known locations
     Update {
+        /// The new value to be used when representing a value
         #[arg()]
         version: String
     }

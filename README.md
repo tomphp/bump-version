@@ -62,7 +62,7 @@ A tool which updates files in your project with the current version number.
 Usage: versioned-files <COMMAND>
 
 Commands:
-  update  
+  update  Updates the version in all known locations
   help    Print this message or the help of the given subcommand(s)
 
 Options:
