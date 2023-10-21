@@ -20,7 +20,13 @@ fn test_readme() {
         .arg("run")
         .arg("--temporary-workspace-dir")
         .arg("--add-path")
-        .arg(env::current_dir().unwrap().join("target/release").to_str().unwrap())
+        .arg(
+            env::current_dir()
+                .unwrap()
+                .join("target/release")
+                .to_str()
+                .unwrap(),
+        )
         .arg("README.md")
         .ok();
 

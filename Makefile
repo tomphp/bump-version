@@ -24,3 +24,6 @@ format:
 .PHONY=test-integration
 test-integration: target/release/versioned-files
 	cargo test --test '*'
+
+.PHONY=test
+test: test-integration
