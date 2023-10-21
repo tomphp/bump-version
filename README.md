@@ -29,7 +29,7 @@ locations:
 Running:
 
 ```shell, script(expected_exit_code=0)
-versioned-files bump 2.3.16
+versioned-files update 2.3.16
 ```
 
 Will update `README.md` so that:
@@ -62,8 +62,8 @@ A tool which updates files in your project with the current version number.
 Usage: versioned-files <COMMAND>
 
 Commands:
-  bump  
-  help  Print this message or the help of the given subcommand(s)
+  update  
+  help    Print this message or the help of the given subcommand(s)
 
 Options:
   -h, --help     Print help
@@ -83,16 +83,16 @@ versioned-files 0.1.0
 
 ## Configuration
 
-When running the `bump` command, a configuration file is required.
+When running the `update` command, a configuration file is required.
 By default, `versioned-files` looks for a file named `versioned-files.yml` in the current directory.
 
 ### Missing Configuration
 
-If you run `versioned-files bump` without a configuration file present like this:
+If you run `versioned-files update` without a configuration file present like this:
 
 ```shell, script(expected_exit_code=1)
 rm -f versioned-files.yml # TODO extract section into another doc and remove this
-versioned-files bump 1.2.3
+versioned-files update 1.2.3
 ```
 
 Then you will see the following error:

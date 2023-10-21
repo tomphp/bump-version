@@ -11,7 +11,7 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
-    Bump {
+    Update {
         #[arg()]
         version: String
     }
@@ -23,7 +23,7 @@ fn main() {
     let cli = Cli::parse();
 
     match &cli.command {
-        Commands::Bump { version: _ } => {
+        Commands::Update { version: _ } => {
             if !Path::new(CONFIG_FILE).exists() {
                 eprintln!("ERROR: No {CONFIG_FILE} file found.");
                 process::exit(1);
