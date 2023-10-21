@@ -1,0 +1,15 @@
+queue_rules:
+  - name: dependabot
+    conditions:
+      - status-success=all-checks-passed
+
+pull_request_rules:
+  - name: dependabot
+    conditions:
+      - status-success=all-checks-passed
+      - base=main
+      - author=dependabot[bot]
+    actions:
+      queue:
+        method: merge
+        name: dependabot
