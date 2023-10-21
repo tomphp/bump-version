@@ -1,10 +1,10 @@
 [package]
-name = "bump-version"
+name = "versioned-files"
 version = "0.1.0"
 edition = "2021"
 description = "A tool which updates files in your project with the current version number."
 license-file = "LICENSE"
-repository = "https://github.com/tomphp/bump-version"
+repository = "https://github.com/tomphp/versioned-files"
 keywords = ["build", "release", "versioning", "automation"]
 categories = ["command-line-utilities", "development-tools"]
 

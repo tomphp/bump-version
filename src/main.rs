@@ -18,12 +18,14 @@ enum Commands {
 }
 
 fn main() {
+    static CONFIG_FILE: &str = "versioned-files.yml";
+
     let cli = Cli::parse();
 
     match &cli.command {
         Commands::Bump { version: _ } => {
-            if !Path::new("bump-version.yml").exists() {
-                eprintln!("ERROR: No bump-version.yml file found.");
+            if !Path::new(CONFIG_FILE).exists() {
+                eprintln!("ERROR: No {CONFIG_FILE} file found.");
                 process::exit(1);
             }
         }

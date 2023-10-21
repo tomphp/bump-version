@@ -1,9 +1,9 @@
 SOURCE_FILES := $(shell find src -type f)
 
-target/debug/bump-version: Cargo.toml Cargo.lock src/ $(SOURCE_FILES)
+target/debug/versioned-files: Cargo.toml Cargo.lock src/ $(SOURCE_FILES)
 	cargo build
 
-target/release/bump-version: Cargo.toml Cargo.lock src/ $(SOURCE_FILES)
+target/release/versioned-files: Cargo.toml Cargo.lock src/ $(SOURCE_FILES)
 	cargo build --release
 
 .PHONY=clean
@@ -22,5 +22,5 @@ format:
 	cargo fmt --all
 
 .PHONY=test-integration
-test-integration: target/release/bump-version
+test-integration: target/release/versioned-files
 	cargo test --test '*'

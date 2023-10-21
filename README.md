@@ -1,4 +1,4 @@
-# Bump Version
+# Versioned Files
 
 A tool which updates files in your project with the current version number.
 
@@ -17,9 +17,9 @@ Given a file `README.md` which contains:
 The current version is `v2.3.16`
 ```
 
-And a `bump-version.yml` file which contains:
+And a `versioned-files.yml` file which contains:
 
-```yaml, file(path="bump-version.yml")
+```yaml, file(path="versioned-files.yml")
 locations:
   - type: string-pattern
     file: README.md
@@ -29,7 +29,7 @@ locations:
 Running:
 
 ```shell, script(expected_exit_code=0)
-bump-version bump 2.3.16
+versioned-files bump 2.3.16
 ```
 
 Will update `README.md` so that:
@@ -51,7 +51,7 @@ The current version is `v2.3.16`
 For help on available commands you can run:
 
 ```shell, script()
-bump-version help
+versioned-files help
 ```
 
 This will give you all the details you need:
@@ -59,7 +59,7 @@ This will give you all the details you need:
 ```text, verify()
 A tool which updates files in your project with the current version number.
 
-Usage: bump-version <COMMAND>
+Usage: versioned-files <COMMAND>
 
 Commands:
   bump  
@@ -74,29 +74,29 @@ Options:
 
 To find out what version you are running, you can run:
 ```shell, script()
-bump-version --version
+versioned-files --version
 ```
 
 ```text, verify()
-bump-version 0.1.0
+versioned-files 0.1.0
 ```
 
 ## Configuration
 
 When running the `bump` command, a configuration file is required.
-By default, `bump-version` looks for a file named `bump-version.yml` in the current directory.
+By default, `versioned-files` looks for a file named `versioned-files.yml` in the current directory.
 
 ### Missing Configuration
 
-If you run `bump-version bump` without a configuration file present like this:
+If you run `versioned-files bump` without a configuration file present like this:
 
 ```shell, script(expected_exit_code=1)
-rm -f bump-version.yml # TODO extract section into another doc and remove this
-bump-version bump 1.2.3
+rm -f versioned-files.yml # TODO extract section into another doc and remove this
+versioned-files bump 1.2.3
 ```
 
 Then you will see the following error:
 
 ```text, verify(stream=stderr)
-ERROR: No bump-version.yml file found.
+ERROR: No versioned-files.yml file found.
 ```
