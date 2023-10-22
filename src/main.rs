@@ -30,13 +30,7 @@ enum Commands {
 #[derive(Debug, Deserialize, PartialEq)]
 enum Location {
     #[serde(rename = "string-pattern")]
-    StringPattern(StringPatternConfig),
-}
-
-#[derive(Debug, Deserialize, PartialEq)]
-struct StringPatternConfig {
-    file: String,
-    pattern: String,
+    StringPattern(location_types::string_pattern::Config),
 }
 
 #[derive(Debug, Deserialize, PartialEq)]
@@ -99,8 +93,7 @@ fn update_location(version: &str, location: &Location) -> anyhow::Result<()> {
         StringPattern(location_config) => {
             print!("Updating {}...", location_config.file);
             match location_types::string_pattern::replace_version_with_string_pattern(
-                Path::new(&location_config.file),
-                &location_config.pattern,
+                location_config,
                 version,
             ) {
                 Ok(()) => {
