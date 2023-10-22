@@ -32,3 +32,22 @@ fn test_readme() {
 
     assert_ok(&result);
 }
+
+#[test]
+fn test_docs_errors() {
+    let result = Command::new("specdown")
+        .arg("run")
+        .arg("--temporary-workspace-dir")
+        .arg("--add-path")
+        .arg(
+            env::current_dir()
+                .unwrap()
+                .join("target/release")
+                .to_str()
+                .unwrap(),
+        )
+        .arg("docs/errors.md")
+        .ok();
+
+    assert_ok(&result);
+}

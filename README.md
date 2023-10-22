@@ -21,7 +21,7 @@ And a `versioned-files.yml` file which contains:
 
 ```yaml, file(path="versioned-files.yml")
 locations:
-  - type: string-pattern
+  - !string-pattern
     file: README.md
     pattern: The current version is `v{{version}}`
 ```
@@ -29,10 +29,16 @@ locations:
 Running:
 
 ```shell, script(expected_exit_code=0)
-versioned-files update 2.3.16
+versioned-files update 2.4.1
 ```
 
-Will update `README.md` so that:
+Will output:
+
+```text, verify()
+Updating README.md...success
+```
+
+And will update `README.md` so that:
 
 ```shell, script()
 cat README.md
@@ -43,7 +49,7 @@ Will output:
 ```text, verify()
 # Example Project Docs
 
-The current version is `v2.3.16`
+The current version is `v2.4.1`
 ```
 
 ## Getting Help

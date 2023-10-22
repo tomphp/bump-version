@@ -1,9 +1,12 @@
-use anyhow::anyhow;
-use clap::{Parser, Subcommand};
-use serde::Deserialize;
 use std::fs::File;
 use std::path::Path;
 use std::process;
+
+use anyhow::anyhow;
+use clap::{Parser, Subcommand};
+use serde::Deserialize;
+
+use crate::Location::StringPattern;
 
 mod location_types;
 
@@ -24,17 +27,21 @@ enum Commands {
     },
 }
 
-#[derive(Deserialize)]
-struct Location {
-    #[serde(alias = "type")]
-    location_type: String,
+#[derive(Debug, Deserialize, PartialEq)]
+enum Location {
+    #[serde(rename = "string-pattern")]
+    StringPattern(StringPatternConfig),
+}
+
+#[derive(Debug, Deserialize, PartialEq)]
+struct StringPatternConfig {
     file: String,
     pattern: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize, PartialEq)]
 struct Config {
-    locations: Box<[Location]>,
+    locations: Vec<Location>,
 }
 
 fn check_file_exists(path: &str) -> anyhow::Result<&str> {
@@ -58,25 +65,53 @@ fn read_config(path: &str) -> anyhow::Result<Config> {
 }
 
 fn main() {
-    const CONFIG_FILE: &str = "versioned-files.yml";
-
     let cli = Cli::parse();
 
     match &cli.command {
-        Commands::Update { version: _ } => match read_config(CONFIG_FILE) {
-            Ok(config) => {
-                for location in &*config.locations {
-                    location_types::string_pattern::do_it();
-                    println!(
-                        "type: {} / file: {} / pattern: {}",
-                        location.location_type, location.file, location.pattern
-                    );
+        Commands::Update { version } => update_command(version),
+    }
+}
+
+fn update_command(version: &str) {
+    const CONFIG_FILE: &str = "versioned-files.yml";
+
+    match read_config(CONFIG_FILE) {
+        Ok(config) => {
+            for location in &*config.locations {
+                match update_location(version, location) {
+                    Ok(()) => {}
+                    Err(err) => {
+                        println!("ERROR: {err}");
+                        process::exit(1);
+                    }
                 }
             }
-            Err(err) => {
-                eprintln!("ERROR: {err}");
-                process::exit(1);
+        }
+        Err(err) => {
+            eprintln!("ERROR: {err}");
+            process::exit(1);
+        }
+    }
+}
+
+fn update_location(version: &str, location: &Location) -> anyhow::Result<()> {
+    match location {
+        StringPattern(location_config) => {
+            print!("Updating {}...", location_config.file);
+            match location_types::string_pattern::replace_version_with_string_pattern(
+                Path::new(&location_config.file),
+                &location_config.pattern,
+                version,
+            ) {
+                Ok(()) => {
+                    println!("success");
+                    Ok(())
+                }
+                Err(err) => {
+                    println!("failed");
+                    Err(err)
+                }
             }
-        },
+        }
     }
 }

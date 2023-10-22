@@ -13,8 +13,7 @@ pub(crate) fn substitute_pattern(
 
 #[cfg(test)]
 mod tests {
-    use super::substitute_pattern;
-    use crate::location_types::string_pattern::pattern::Pattern;
+    use super::{substitute_pattern, Pattern};
 
     #[test]
     fn substitute_pattern_returns_string_with_version_substituted() {
