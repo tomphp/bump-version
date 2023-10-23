@@ -22,24 +22,7 @@ jobs:
       - test-github-actions
     if: github.ref == 'refs/heads/main' && needs.run-tests.outputs.will-bump == 'true'
     steps:
-      - uses: actions/checkout@v4
-        name: Checkout the repository
-      - uses: actions/cache@v3.3.2
-        name: Cache cargo dependencies
-        with:
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          path: |
-            .cache
-            ~/.cargo/registry
-            ~/.cargo/git
-            ~/.cargo/bin
-            target
-      - uses: actions-rs/toolchain@v1.0.7
-        name: Install rust toolchain
-        with:
-          default: true
-          profile: minimal
-          toolchain: stable
+      - uses: tomphp/github-actions/checkout-rust-project@v0.2.0
       - uses: actions-rs/cargo@v1.0.3
         name: Build release version
         with:
@@ -63,28 +46,7 @@ jobs:
     needs:
       - run-tests
     steps:
-      - run: ${{ matrix.install }}
-        env:
-          DEBIAN_FRONTEND: noninteractive
-        name: Install additional dependencies
-      - uses: actions/checkout@v4
-        name: Checkout the repository
-      - uses: actions/cache@v3.3.2
-        name: Cache cargo dependencies
-        with:
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          path: |
-            .cache
-            ~/.cargo/registry
-            ~/.cargo/git
-            ~/.cargo/bin
-            target
-      - uses: actions-rs/toolchain@v1.0.7
-        name: Install rust toolchain
-        with:
-          default: true
-          profile: minimal
-          toolchain: stable
+      - uses: tomphp/github-actions/checkout-rust-project@v0.2.0
       - uses: actions-rs/cargo@v1.0.3
         name: Build release version
         with:
@@ -113,15 +75,12 @@ jobs:
           - os: macos-latest
             suffix: ''
             target: x86_64-apple-darwin
-            install: ''
           - os: ubuntu-latest
             suffix: ''
             target: x86_64-unknown-linux-gnu
-            install: ''
           - os: windows-latest
             suffix: .exe
             target: x86_64-pc-windows-msvc
-            install: ''
 
   tag-and-release:
     needs:
