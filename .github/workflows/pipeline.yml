@@ -45,8 +45,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     needs:
       - run-tests
+      - bump-cargo-version
     steps:
       - uses: tomphp/github-actions/checkout-rust-project@v0.2.0
+      - uses: actions/download-artifact@v3
       - uses: actions-rs/cargo@v1.0.3
         name: Build release version
         with:
