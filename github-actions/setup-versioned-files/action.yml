@@ -1,0 +1,103 @@
+name: Setup Versioned Files Action
+description: Setup versioned-files on the path in your GitHub Actions job
+branding:
+  icon: arrow-down
+  color: blue
+
+inputs:
+  version:
+    description: Version of versioned-files to install
+    required: false
+    default: 'latest'
+
+outputs:
+  version:
+    description: The version on the path
+    value: ${{ steps.install.outputs.version }}
+
+runs:
+  using: composite
+  steps:
+    - name: Set Repository
+      id: define-source
+      env:
+        OWNER: tomphp
+        REPOSITORY: versioned-files
+      run: |
+        set -euo pipefail
+
+        echo "github-owner=$OWNER" >> "$GITHUB_OUTPUT"
+        echo "github-repository=$REPOSITORY" >> "$GITHUB_OUTPUT"
+      shell: bash
+
+    - name: Determine URL
+      id: get-url
+      env:
+        INSTALL_VERSION: ${{ inputs.version }}
+        OWNER: ${{ steps.define-source.outputs.github-owner }}
+        REPOSITORY: ${{ steps.define-source.outputs.github-repository }}
+      run: |
+        set -euo pipefail
+
+        if [ "$INSTALL_VERSION" == "latest" ]; then
+            url="https://github.com/$OWNER/$REPOSITORY/releases/latest/download/"
+        else
+            url="https://github.com/$OWNER/$REPOSITORY/releases/download/v$INSTALL_VERSION/"
+        fi
+
+        echo "url=$url" >> "$GITHUB_OUTPUT"
+      shell: bash
+
+    - name: Determine Source
+      id: get-source
+      env:
+        SOURCE_URL: ${{ steps.get-url.outputs.url }}
+        FILENAME: versioned-files
+        WINDOWS_SUFFIX: x86_64-pc-windows-msvc.exe
+        LINUX_SUFFIX: x86_64-unknown-linux-gnu
+        MACOS_SUFFIX: x86_64-apple-darwin
+      run: |
+        set -euo pipefail
+
+        if [ "$RUNNER_OS" == "Linux" ]; then
+             source_file="$FILENAME-$LINUX_SUFFIX"
+             target_file="$FILENAME"
+        elif [ "$RUNNER_OS" == "Windows" ]; then
+             source_file="$FILENAME-$WINDOWS_SUFFIX"
+             target_file="$FILENAME.exe"
+        elif [ "$RUNNER_OS" == "macOS" ]; then
+             source_file="$FILENAME-$MACOS_SUFFIX"
+             target_file="$FILENAME"
+        else
+             echo "$RUNNER_OS not supported"
+             exit 1
+        fi
+
+        echo "source_url=$SOURCE_URL/$source_file" >> "$GITHUB_OUTPUT"
+        echo "target_file=$target_file" >> "$GITHUB_OUTPUT"
+      shell: bash
+
+    - name: Install versioned-files
+      id: install
+      env:
+        BIN_FOLDER: versioned-files-bin
+        SOURCE_URL: ${{ steps.get-source.outputs.source_url }}
+        TARGET_FILE: ${{ steps.get-source.outputs.target_file }}
+        GITHUB_TOKEN: ${{ github.token }}
+        GITHUB_ACTOR: ${{ github.actor }}
+        VERSION_COMMAND: ${{ steps.get-source.outputs.target_file }} --version | cut -d " " -f2
+      run: |
+        set -euo pipefail
+
+        BIN_FOLDER="$RUNNER_TEMP/$BIN_FOLDER"
+
+        mkdir -p "$BIN_FOLDER"
+        curl -u "$GITHUB_ACTOR:$GITHUB_TOKEN" -Lo "$BIN_FOLDER/$TARGET_FILE" "$SOURCE_URL"
+        chmod +x "$BIN_FOLDER/$TARGET_FILE"
+
+        echo "Installed in $BIN_FOLDER/$TARGET_FILE"
+        sum "$BIN_FOLDER/$TARGET_FILE"
+
+        echo "$BIN_FOLDER/" >> "$GITHUB_PATH"
+        echo "version=$( $VERSION_COMMAND )" >> "$GITHUB_OUTPUT"
+      shell: bash
