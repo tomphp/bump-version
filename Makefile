@@ -11,7 +11,7 @@ clean:
 	rm -rf target/
 
 .PHONY=check
-check:
+lint:
 	cargo fmt --all -- --check
 	cargo clippy --all-targets --all-features -- -D warnings -D clippy::all -D clippy::pedantic -D clippy::cargo -A clippy::multiple-crate-versions
 	cargo check
@@ -23,7 +23,14 @@ format:
 
 .PHONY=test-integration
 test-integration: target/release/versioned-files
-	cargo test --test '*'
+	cargo test --test '*' --locked
+
+.PHONY=test-unit
+test-unit:
+	cargo test --bins --locked
 
 .PHONY=test
-test: test-integration
+test: test-unit test-integration
+
+.PHONY=precommit
+precommit: lint test

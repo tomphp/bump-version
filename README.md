@@ -62,10 +62,26 @@ versioned-files help
 
 This will give you all the details you need:
 
-```text, verify()
+(Non-windows)
+```text, verify(target_os="!windows")
 A tool which updates files in your project with the current version number.
 
 Usage: versioned-files <COMMAND>
+
+Commands:
+  update  Updates the version in all known locations
+  help    Print this message or the help of the given subcommand(s)
+
+Options:
+  -h, --help     Print help
+  -V, --version  Print version
+```
+
+(Windows)
+```text, verify(target_os="windows")
+A tool which updates files in your project with the current version number.
+
+Usage: versioned-files.exe <COMMAND>
 
 Commands:
   update  Updates the version in all known locations
