@@ -48,8 +48,8 @@ runs:
         echo "url=$url" >> "$GITHUB_OUTPUT"
       shell: bash
 
-    - name: Determine Source
-      id: get-source
+    - name: Determine Binary Name
+      id: get-binary-name
       env:
         SOURCE_URL: ${{ steps.get-url.outputs.url }}
         FILENAME: versioned-files
@@ -60,29 +60,32 @@ runs:
         set -euo pipefail
 
         if [ "$RUNNER_OS" == "Linux" ]; then
-             source_file="$FILENAME-$LINUX_SUFFIX"
-             target_file="$FILENAME"
+          suffix="$LINUX_SUFFIX"
+          target_file="$FILENAME"
         elif [ "$RUNNER_OS" == "Windows" ]; then
-             source_file="$FILENAME-$WINDOWS_SUFFIX"
-             target_file="$FILENAME.exe"
+          suffix="$WINDOWS_SUFFIX"
+          target_file="$FILENAME.exe"
         elif [ "$RUNNER_OS" == "macOS" ]; then
-             source_file="$FILENAME-$MACOS_SUFFIX"
-             target_file="$FILENAME"
+          suffix="$MACOS_SUFFIX"
+          target_file="$FILENAME"
         else
-             echo "$RUNNER_OS not supported"
-             exit 1
+          echo "$RUNNER_OS not supported"
+          exit 1
         fi
+        
+        source_file="$FILENAME-$suffix"
 
-        echo "source_url=$SOURCE_URL/$source_file" >> "$GITHUB_OUTPUT"
-        echo "target_file=$target_file" >> "$GITHUB_OUTPUT"
+        echo "name-with-arch=$source_file" >> "$GITHUB_OUTPUT"
+        echo "name=$target_file" >> "$GITHUB_OUTPUT"
+        echo "suffix=$suffix" >> "$GITHUB_OUTPUT"
       shell: bash
 
     - name: Install versioned-files
       id: install
       env:
         BIN_FOLDER: versioned-files-bin
-        SOURCE_URL: ${{ steps.get-source.outputs.source_url }}
-        TARGET_FILE: ${{ steps.get-source.outputs.target_file }}
+        SOURCE_URL: ${{ steps.get-url.outputs.url }}/${{ steps.get-binary-name.outputs.name-with-arch }}
+        TARGET_FILE: ${{ steps.get-binary-name.outputs.name }}
         GITHUB_TOKEN: ${{ github.token }}
         GITHUB_ACTOR: ${{ github.actor }}
         VERSION_COMMAND: ${{ steps.get-source.outputs.target_file }} --version | cut -d " " -f2
