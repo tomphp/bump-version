@@ -12,10 +12,14 @@ jobs:
   run-tests:
     uses: ./.github/workflows/run-tests.yml
 
+  test-github-actions:
+    uses: ./.github/workflows/test-actions.yml
+
   bump-cargo-version:
     runs-on: ubuntu-latest
     needs:
       - run-tests
+      - test-github-actions
     if: github.ref == 'refs/heads/main' && needs.run-tests.outputs.will-bump == 'true'
     steps:
       - uses: actions/checkout@v4

@@ -1,9 +1,6 @@
 name: Test Github Actions
 on:
-  push:
-    branches:
-      - '*'
-  pull_request:
+  workflow_call:
 
 jobs:
   test-setup-versioned-files:
