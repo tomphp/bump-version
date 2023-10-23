@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## [v0.2.0](https://github.com/tomphp/versioned-files/compare/v0.1.0..v0.2.0) - 2023-10-23
+#### Features
+- **(setup-versioned-files-action)** Create github action - ([cf92e86](https://github.com/tomphp/versioned-files/commit/cf92e864f3ae743cd5cec39e934b803d247de7ab)) - Tom Oram
+
+- - -
+
 ## [v0.1.0](https://github.com/tomphp/versioned-files/compare/451c32208e96ae9521161741186f87c8546b2c69..v0.1.0) - 2023-10-23
 #### Build system
 - Add specdown - ([f576a20](https://github.com/tomphp/versioned-files/commit/f576a20b1dbcfb8a1b147ac97d12d7fa7c32c890)) - Tom Oram
