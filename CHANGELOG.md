@@ -2,6 +2,18 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## [v0.2.1](https://github.com/tomphp/versioned-files/compare/v0.2.0..v0.2.1) - 2023-10-24
+#### Bug Fixes
+- **(ci)** Update the version number - ([a767887](https://github.com/tomphp/versioned-files/commit/a767887cd301eecbc6962d8f65128aa0c7c25cba)) - Tom Oram
+#### Continuous Integration
+- Use tomphp/github-actions/checkout-rust-project - ([dfc7d36](https://github.com/tomphp/versioned-files/commit/dfc7d368234f42f00665552820a436bccc415fe7)) - Tom Oram
+- Require GitHub action tests to pass before releasing - ([025643b](https://github.com/tomphp/versioned-files/commit/025643b23393df5bc5a48e561eef421f8bc4df36)) - Tom Oram
+#### Refactoring
+- **(setup-versioned-files-action)** Use tomphp/github-actions/install-release-binary - ([fbcde17](https://github.com/tomphp/versioned-files/commit/fbcde175dad5eaede4fe3a59afd4523f6fa52f9d)) - Tom Oram
+- **(setup-versioned-files-action)** Add Determine Binary Name step - ([1e933de](https://github.com/tomphp/versioned-files/commit/1e933de77f8a945e5b6040fb638b0fed67d595cc)) - Tom Oram
+
+- - -
+
 ## [v0.2.0](https://github.com/tomphp/versioned-files/compare/v0.1.0..v0.2.0) - 2023-10-23
 #### Features
 - **(setup-versioned-files-action)** Create github action - ([cf92e86](https://github.com/tomphp/versioned-files/commit/cf92e864f3ae743cd5cec39e934b803d247de7ab)) - Tom Oram
