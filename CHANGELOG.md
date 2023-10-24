@@ -2,6 +2,19 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## [v0.4.1](https://github.com/tomphp/versioned-files/compare/v0.4.0..v0.4.1) - 2023-10-24
+#### Bug Fixes
+- **(ci)** Use the versioned-files action to bump versions - ([d8cca23](https://github.com/tomphp/versioned-files/commit/d8cca236178b66dd3ff18fed1dd1b6f5d5d054d0)) - Tom Oram
+- **(update-command)** Wait for cargo-edit to install - ([06f72d7](https://github.com/tomphp/versioned-files/commit/06f72d7572fb23bd2897aa72e2803f84f2fb3dc4)) - Tom Oram
+#### Build system
+- Create make target to build release version - ([b0f9b62](https://github.com/tomphp/versioned-files/commit/b0f9b629c94d26f409780b29f0d7f1a9d1110973)) - Tom Oram
+#### Continuous Integration
+- Temporarily use built version to bump - ([a6a979e](https://github.com/tomphp/versioned-files/commit/a6a979e5e9e2b44fd72c310e79b43d9efcc74289)) - Tom Oram
+#### Style
+- Fix lint issues - ([ed5eff6](https://github.com/tomphp/versioned-files/commit/ed5eff6e272f4f1d1f7670ab201411cce79f514f)) - Tom Oram
+
+- - -
+
 ## [v0.4.0](https://github.com/tomphp/versioned-files/compare/v0.3.0..v0.4.0) - 2023-10-24
 #### Features
 - **(versioned-files-action)** Create action - ([5b6638b](https://github.com/tomphp/versioned-files/commit/5b6638bb69870c53d9066bd7e1bc41634fcff378)) - Tom Oram
