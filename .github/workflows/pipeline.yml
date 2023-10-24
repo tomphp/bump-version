@@ -24,6 +24,9 @@ jobs:
       - check-conventional-commits
       - run-tests
       - test-github-actions
+    steps:
+      - run: echo "OK"
+        shell: bash
 
   bump-cargo-version:
     runs-on: ubuntu-latest
@@ -39,7 +42,7 @@ jobs:
         env:
           VERSION: ${{ needs.check-conventional-commits.outputs.bump-version }}
       - name: Bump versions in files
-        uses: ./github-actions/versioned-files
+        uses: tomphp/versioned-files/github-actions/versioned-files@v0.4.2
         with:
           action: update
           version: ${{ steps.strip-version-prefix.outputs.version }}
