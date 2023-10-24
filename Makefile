@@ -6,6 +6,9 @@ target/debug/versioned-files: Cargo.toml Cargo.lock src/ $(SOURCE_FILES)
 target/release/versioned-files: Cargo.toml Cargo.lock src/ $(SOURCE_FILES)
 	cargo build --release
 
+versioned-files: target/release/versioned-files
+	mv target/release/versioned-files .
+
 .PHONY=clean
 clean:
 	rm -rf target/
