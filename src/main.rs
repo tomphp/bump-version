@@ -73,18 +73,16 @@ fn update_location(version: &str, location: &Location) -> anyhow::Result<()> {
                 }
             }
         }
-        Cargo => {
-            match location_types::cargo::update_cargo_version(version) {
-                Ok(_) => {
-                    println!("Updating Cargo.toml...success");
-                    println!("Updating Cargo.lock...success");
-                    Ok(())
-                }
-                Err(err) => {
-                    println!("{err}");
-                    Err(err)
-                }
+        Cargo => match location_types::cargo::update_cargo_version(version) {
+            Ok(()) => {
+                println!("Updating Cargo.toml...success");
+                println!("Updating Cargo.lock...success");
+                Ok(())
             }
-        }
+            Err(err) => {
+                println!("{err}");
+                Err(err)
+            }
+        },
     }
 }

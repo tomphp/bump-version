@@ -9,7 +9,7 @@ pub(crate) enum Location {
     #[serde(rename = "string-pattern")]
     StringPattern(location_types::string_pattern::Config),
     #[serde(rename = "cargo")]
-    Cargo
+    Cargo,
 }
 
 #[derive(Debug, Deserialize, PartialEq)]
