@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## [v0.2.2](https://github.com/tomphp/versioned-files/compare/v0.2.1..v0.2.2) - 2023-10-24
+#### Bug Fixes
+- **(build)** Compile binary with correct version number - ([e4cfc2d](https://github.com/tomphp/versioned-files/commit/e4cfc2d615aa957cc55cb56097ee67560774b589)) - Tom Oram
+
+- - -
+
 ## [v0.2.1](https://github.com/tomphp/versioned-files/compare/v0.2.0..v0.2.1) - 2023-10-24
 #### Bug Fixes
 - **(ci)** Update the version number - ([a767887](https://github.com/tomphp/versioned-files/commit/a767887cd301eecbc6962d8f65128aa0c7c25cba)) - Tom Oram
