@@ -2,6 +2,16 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## [v0.3.0](https://github.com/tomphp/versioned-files/compare/v0.2.2..v0.3.0) - 2023-10-24
+#### Documentation
+- Update version - ([2559870](https://github.com/tomphp/versioned-files/commit/25598708681546a6e1d83cb7a688e7f979c69d60)) - Tom Oram
+#### Features
+- **(update-command)** Add !cargo - ([ec16aaa](https://github.com/tomphp/versioned-files/commit/ec16aaa020af4f465242635521a69c5e9b182866)) - Tom Oram
+#### Style
+- Apply code styles - ([8743505](https://github.com/tomphp/versioned-files/commit/8743505c6f6bac153617cd7bf695a8854ee94548)) - Tom Oram
+
+- - -
+
 ## [v0.2.2](https://github.com/tomphp/versioned-files/compare/v0.2.1..v0.2.2) - 2023-10-24
 #### Bug Fixes
 - **(build)** Compile binary with correct version number - ([e4cfc2d](https://github.com/tomphp/versioned-files/commit/e4cfc2d615aa957cc55cb56097ee67560774b589)) - Tom Oram
