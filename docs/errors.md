@@ -14,7 +14,7 @@ locations:
 versioned-files update 1.2.3
 ```
 ```shell, verify(stream=stderr)
-ERROR: Invalid config file schema: locations: unknown variant `this-type-does-not-exist`, expected `string-pattern` at line 2 column 3
+ERROR: Invalid config file schema: locations: unknown variant `this-type-does-not-exist`, expected `string-pattern` or `cargo` at line 2 column 3
 ```
 
 #### Location file does not exist

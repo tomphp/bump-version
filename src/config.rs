@@ -8,6 +8,8 @@ use std::path::Path;
 pub(crate) enum Location {
     #[serde(rename = "string-pattern")]
     StringPattern(location_types::string_pattern::Config),
+    #[serde(rename = "cargo")]
+    Cargo
 }
 
 #[derive(Debug, Deserialize, PartialEq)]

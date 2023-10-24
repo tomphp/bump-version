@@ -1,9 +1,9 @@
 use std::process;
 
 use clap::{Parser, Subcommand};
-use config::{Config, Location};
 
-use config::Location::StringPattern;
+use config::{Config, Location};
+use Location::{Cargo, StringPattern};
 
 mod config;
 mod location_types;
@@ -69,6 +69,19 @@ fn update_location(version: &str, location: &Location) -> anyhow::Result<()> {
                 }
                 Err(err) => {
                     println!("failed");
+                    Err(err)
+                }
+            }
+        }
+        Cargo => {
+            match location_types::cargo::update_cargo_version(version) {
+                Ok(_) => {
+                    println!("Updating Cargo.toml...success");
+                    println!("Updating Cargo.lock...success");
+                    Ok(())
+                }
+                Err(err) => {
+                    println!("{err}");
                     Err(err)
                 }
             }
