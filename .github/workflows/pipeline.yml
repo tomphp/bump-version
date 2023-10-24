@@ -34,11 +34,16 @@ jobs:
         run: cargo set-version "${NEW_VERSION#v}"
         env:
           NEW_VERSION: ${{ needs.run-tests.outputs.bump-version }}
+      - run: sed -i.bak 's/versioned-files \\d+\\.\\d+\\.\\d+/versioned-files '$NEW_VERSION'/' README.md
+        env:
+          NEW_VERSION: ${{ needs.run-tests.outputs.bump-version }}
       - name: Store updated Cargo files
         uses: actions/upload-artifact@v3
         with:
           name: bumped-files
-          path: Cargo.*
+          path: |
+            Cargo.*
+            README.md
 
   build-binaries:
     if: github.ref == 'refs/heads/main'
@@ -49,6 +54,8 @@ jobs:
     steps:
       - uses: tomphp/github-actions/checkout-rust-project@v0.2.0
       - uses: actions/download-artifact@v3
+      - run: mv bumped-files/Cargo.* .
+        shell: bash
       - uses: actions-rs/cargo@v1.0.3
         name: Build release version
         with:

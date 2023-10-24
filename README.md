@@ -100,7 +100,7 @@ versioned-files --version
 ```
 
 ```text, verify()
-versioned-files 0.1.0
+versioned-files 0.2.1
 ```
 
 ## Configuration
