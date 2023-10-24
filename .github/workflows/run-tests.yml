@@ -36,10 +36,8 @@ jobs:
           takeown /F 'C:\Windows\System32\bash.exe'
           icacls 'C:\Windows\System32\bash.exe' /grant administrators:F
           ren 'C:\Windows\System32\bash.exe' wsl-bash.exe
-      - run: cargo build --release
-      - run: echo "$PWD/target/debug" >> "$GITHUB_PATH"
-        shell: bash
-      - run: cargo test --locked
+      - name: Run tests
+        run: make test
         shell: bash
 
   lint:
@@ -53,14 +51,9 @@ jobs:
       - uses: tomphp/github-actions/checkout-rust-project@v0.2.0
         with:
           rust-components: rustfmt, clippy
-      - uses: actions-rs/cargo@v1.0.3
-        with:
-          command: fmt
-          args: --all -- --check
-      - uses: actions-rs/cargo@v1.0.3
-        with:
-          command: clippy
-          args: --all-targets --all-features -- -D warnings -Dclippy::all -D clippy::pedantic
-            -D clippy::cargo -A clippy::multiple-crate-versions
-      - uses: gaurav-nelson/github-action-markdown-link-check@1.0.15
+      - name: Check code
+        run: make lint
+        shell: bash
+      - name: Check markdown links
+        uses: gaurav-nelson/github-action-markdown-link-check@1.0.15
         if: matrix.os == 'ubuntu-latest'

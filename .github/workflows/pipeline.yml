@@ -69,16 +69,16 @@ jobs:
         id: get-binary-name
         with:
           name: versioned-files
-      - uses: actions-rs/cargo@v1.0.3
-        name: Build release version
-        with:
-          args: --release --locked
-          command: build
+      - name: Build release version
+        run: make "$BINARY_NAME"
+        env:
+          BINARY_NAME: ${{ steps.get-binary-name.outputs.name }}
+        shell: bash
       - name: Move binary to upload location
         env:
           BINARY_NAME: ${{ steps.get-binary-name.outputs.name }}
           BINARY_NAME_WITH_ARCH: ${{ steps.get-binary-name.outputs.name-with-arch }}
-        run: mv "./target/release/$BINARY_NAME" "./$BINARY_NAME_WITH_ARCH"
+        run: mv "$BINARY_NAME" "$BINARY_NAME_WITH_ARCH"
         shell: bash
       - uses: actions/upload-artifact@v3
         name: Store built binary version

@@ -1,17 +1,26 @@
 SOURCE_FILES := $(shell find src -type f)
 
-target/debug/versioned-files: Cargo.toml Cargo.lock src/ $(SOURCE_FILES)
+ifeq ($(OS),Windows_NT)
+	TARGET_EXTENSION := .exe
+else
+	TARGET_EXTENSION :=
+endif
+
+TARGET := versioned-files$(TARGET_EXTENSION)
+
+target/debug/$(TARGET): Cargo.toml Cargo.lock src/ $(SOURCE_FILES)
 	cargo build
 
-target/release/versioned-files: Cargo.toml Cargo.lock src/ $(SOURCE_FILES)
+target/release/$(TARGET): Cargo.toml Cargo.lock src/ $(SOURCE_FILES)
 	cargo build --release
 
-versioned-files: target/release/versioned-files
-	mv target/release/versioned-files .
+$(TARGET): target/release/$(TARGET)
+	mv target/release/$@ .
 
 .PHONY=clean
 clean:
 	rm -rf target/
+	rm -f $(TARGET)
 
 .PHONY=check
 lint:
@@ -25,7 +34,7 @@ format:
 	cargo fmt --all
 
 .PHONY=test-integration
-test-integration: target/release/versioned-files
+test-integration: target/release/$(TARGET)
 	cargo test --test '*' --locked
 
 .PHONY=test-unit
