@@ -1,0 +1,6 @@
+locations:
+  - !cargo
+
+  - !string-pattern
+    file: README.md
+    pattern: versioned-files {{version}}

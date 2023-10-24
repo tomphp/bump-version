@@ -28,6 +28,5 @@ runs:
 
     - name: Get Installed Version
       id: get-version
-      run: |
-        echo "version=$( versioned-files --version | cut -d " " -f2 )" >> "$GITHUB_OUTPUT"
+      run: echo "version=$( versioned-files --version | cut -d " " -f2 )" >> "$GITHUB_OUTPUT"
       shell: bash

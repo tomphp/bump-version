@@ -23,21 +23,11 @@ jobs:
     if: github.ref == 'refs/heads/main' && needs.run-tests.outputs.will-bump == 'true'
     steps:
       - uses: tomphp/github-actions/checkout-rust-project@v0.2.0
-      - uses: actions-rs/cargo@v1.0.3
-        name: Build release version
+      - uses: tomphp/versioned-files/github-actions/versioned-files@v0.4.0
         with:
-          args: --release --locked
-          command: build
-      - name: Install cargo-edit
-        run: cargo install cargo-edit
-      - name: Set Cargo version
-        run: cargo set-version "${NEW_VERSION#v}"
-        env:
-          NEW_VERSION: ${{ needs.run-tests.outputs.bump-version }}
-      - run: sed -i.bak 's/versioned-files \\d+\\.\\d+\\.\\d+/versioned-files '$NEW_VERSION'/' README.md
-        env:
-          NEW_VERSION: ${{ needs.run-tests.outputs.bump-version }}
-      - name: Store updated Cargo files
+          action: update
+          version: ${{ needs.run-tests.outputs.bump-version }}
+      - name: Store updated files
         uses: actions/upload-artifact@v3
         with:
           name: bumped-files
@@ -56,40 +46,32 @@ jobs:
       - uses: actions/download-artifact@v3
       - run: mv bumped-files/Cargo.* .
         shell: bash
+      - uses: tomphp/github-actions/determine-binary-name@v0.5.0
+        id: get-binary-name
+        with:
+          name: versioned-files
       - uses: actions-rs/cargo@v1.0.3
         name: Build release version
         with:
           args: --release --locked
           command: build
-      - id: get_repository_name
-        name: Calculate repository name
-        run: echo "REPOSITORY_NAME=$(echo "$GITHUB_REPOSITORY" | awk
-          -F / '{print $2}' | sed -e "s/:refs//")" >> "$GITHUB_OUTPUT"
-        shell: bash
       - name: Move binary to upload location
         env:
-          TARGET: ${{ matrix.target }}
-          EXTENSION: ${{ matrix.suffix }}
-          REPOSITORY_NAME: ${{ steps.get_repository_name.outputs.REPOSITORY_NAME }}
-        run: mv "./target/release/$REPOSITORY_NAME$EXTENSION" "./$REPOSITORY_NAME-$TARGET$EXTENSION"
+          BINARY_NAME: ${{ steps.get-binary-name.outputs.name }}
+          BINARY_NAME_WITH_ARCH: ${{ steps.get-binary-name.outputs.name-with-arch }}
+        run: mv "./target/release/$BINARY_NAME" "./$BINARY_NAME_WITH_ARCH"
         shell: bash
       - uses: actions/upload-artifact@v3
         name: Store built binary version
         with:
           name: bins
-          path: ${{ steps.get_repository_name.outputs.REPOSITORY_NAME }}-${{ matrix.target }}${{ matrix.suffix }}
+          path: ${{ steps.get-binary-name.outputs.name-with-arch }}
     strategy:
       matrix:
         include:
           - os: macos-latest
-            suffix: ''
-            target: x86_64-apple-darwin
           - os: ubuntu-latest
-            suffix: ''
-            target: x86_64-unknown-linux-gnu
           - os: windows-latest
-            suffix: .exe
-            target: x86_64-pc-windows-msvc
 
   tag-and-release:
     needs:
