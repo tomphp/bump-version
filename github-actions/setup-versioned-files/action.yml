@@ -18,14 +18,15 @@ outputs:
 runs:
   using: composite
   steps:
-    - uses: tomphp/github-actions/install-release-binary@v0.5.0
+    - name: Install versioned-files
+      uses: tomphp/github-actions/install-release-binary@v0.5.0
       with:
         binary-name: versioned-files
         owner: tomphp
         repository: versioned-files
         version: ${{ inputs.version }}
 
-    - name: Install versioned-files
+    - name: Get Installed Version
       id: get-version
       run: |
         echo "version=$( versioned-files --version | cut -d " " -f2 )" >> "$GITHUB_OUTPUT"
