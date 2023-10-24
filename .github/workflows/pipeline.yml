@@ -23,15 +23,17 @@ jobs:
     if: github.ref == 'refs/heads/main' && needs.run-tests.outputs.will-bump == 'true'
     steps:
       - uses: tomphp/github-actions/checkout-rust-project@v0.2.0
-      - uses: actions-rs/cargo@v1.0.3
-        name: Build release version
-        with:
-          args: --release --locked
-          command: build
-      - run: target/release/versioned-files update ${VERSION#v}
+      - name: Strip version prefix
+        id: strip-version-prefix
+        shell: bash
+        run: echo "version=${VERSION#v}" >> "$GITHUB_OUTPUT"
         env:
           VERSION: ${{ needs.run-tests.outputs.bump-version }}
-        shell: bash
+      - name: Bump versions in files
+        uses: tomphp/versioned-files/github-actions/versioned-files@v0.4.1
+        with:
+          action: update
+          version: ${{ steps.strip-version-prefix.outputs.version }}
       - name: Store updated files
         uses: actions/upload-artifact@v3
         with:
