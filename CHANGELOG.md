@@ -2,6 +2,15 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## [v0.4.2](https://github.com/tomphp/versioned-files/compare/v0.4.1..v0.4.2) - 2023-10-24
+#### Bug Fixes
+- **(ci)** Use the versioned-files action to bump versions - ([40ed363](https://github.com/tomphp/versioned-files/commit/40ed36339a008d272026e9ceb0701e79d8db225c)) - Tom Oram
+- **(versioned-files-action)** Use lastest version - ([0b54281](https://github.com/tomphp/versioned-files/commit/0b54281f957ccd062fb3d49e9ac11b862c2ba3bc)) - Tom Oram
+#### Continuous Integration
+- Temporarily use use versioned-files action directly - ([1f2e056](https://github.com/tomphp/versioned-files/commit/1f2e0566614ee69058a905506bf9201a97cf8d17)) - Tom Oram
+
+- - -
+
 ## [v0.4.1](https://github.com/tomphp/versioned-files/compare/v0.4.0..v0.4.1) - 2023-10-24
 #### Bug Fixes
 - **(ci)** Use the versioned-files action to bump versions - ([d8cca23](https://github.com/tomphp/versioned-files/commit/d8cca236178b66dd3ff18fed1dd1b6f5d5d054d0)) - Tom Oram
