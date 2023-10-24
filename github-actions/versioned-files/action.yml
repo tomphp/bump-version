@@ -14,8 +14,6 @@ runs:
   steps:
     - uses: tomphp/versioned-files/github-actions/setup-versioned-files@v0.3.0
       name: Install versioned-files
-      with:
-        version: 0.3.0
 
     - name: Run versioned-files
       id: get-version
