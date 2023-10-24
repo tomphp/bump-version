@@ -30,7 +30,7 @@ jobs:
         env:
           VERSION: ${{ needs.run-tests.outputs.bump-version }}
       - name: Bump versions in files
-        uses: tomphp/versioned-files/github-actions/versioned-files@v0.4.1
+        uses: ./github-actions/versioned-files
         with:
           action: update
           version: ${{ steps.strip-version-prefix.outputs.version }}
