@@ -1,6 +1,6 @@
 use anyhow::anyhow;
 use std::io::Read;
-use std::process::{Command, Stdio};
+use std::process::{Child, Command, ExitStatus, Stdio};
 
 pub(crate) fn update_cargo_version(version: &str) -> anyhow::Result<()> {
     check_cargo_is_installed()?;
@@ -10,72 +10,86 @@ pub(crate) fn update_cargo_version(version: &str) -> anyhow::Result<()> {
 }
 
 fn check_cargo_is_installed() -> anyhow::Result<()> {
-    let command = Command::new("cargo")
+    Command::new("cargo")
         .arg("--version")
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
-        .spawn();
-
-    match command {
-        Ok(_) => Ok(()),
-        Err(err) => Err(anyhow!(
-            "Failed to execute cargo, please make sure it is installed: {err}"
-        )),
-    }
+        .spawn()
+        .map_err(|err| anyhow!("Failed to execute cargo, please make sure it is installed: {err}"))
+        .and_then(wait_for_command)
+        .and_then(returned_zero_or_error(|result| anyhow!(
+            "Failed to get cargo version (exit code: {}): {}",
+            result.exit_status,
+            result.stderr
+        )))
+        .map(|_| ())
 }
 
 fn install_cargo_edit() -> anyhow::Result<()> {
-    let command = Command::new("cargo")
+    Command::new("cargo")
         .arg("install")
         .arg("cargo-edit")
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
-        .spawn();
-
-    match command {
-        Ok(_) => Ok(()),
-        Err(err) => Err(anyhow!("Failed install cargo-edit: {err}")),
-    }
+        .spawn()
+        .map_err(|err| anyhow!("Failed install cargo-edit: {err}"))
+        .and_then(wait_for_command)
+        .and_then(returned_zero_or_error(|result| anyhow!(
+            "Failed to install cargo-edit (exit code: {}): {}",
+            result.exit_status,
+            result.stderr
+        )))
+        .map(|_| ())
 }
 
 fn update_version(version: &str) -> anyhow::Result<()> {
-    let command = Command::new("cargo")
+    Command::new("cargo")
         .arg("set-version")
         .arg(version)
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
-        .spawn();
+        .spawn()
+        .map_err(|err| anyhow!("Failed to update Cargo version: {err}"))
+        .and_then(wait_for_command)
+        .and_then(returned_zero_or_error(|result| anyhow!(
+            "Failed to set version (exit code: {}): {}",
+            result.exit_status,
+            result.stderr
+        )))
+        .map(|_| ())
+}
 
-    match command {
-        Ok(mut child) => {
-            let mut stdout = String::new();
-            let mut stderr = String::new();
+struct CommandResult {
+    exit_status: ExitStatus,
+    stdout: String,
+    stderr: String,
+}
 
-            child
-                .stdout
-                .as_mut()
-                .unwrap()
-                .read_to_string(&mut stdout)
-                .unwrap();
-            child
-                .stderr
-                .as_mut()
-                .unwrap()
-                .read_to_string(&mut stderr)
-                .unwrap();
+fn wait_for_command(mut child: Child) -> anyhow::Result<CommandResult> {
+    let exit_status = child.wait()?;
 
-            let exit_status = child
-                .wait()
-                .expect("Failed to wait for the command to finish");
+    let mut stdout = String::new();
+    child.stdout.as_mut().ok_or(anyhow!("failed to unwrap stdout"))?.read_to_string(&mut stdout)?;
 
-            if exit_status.success() {
-                Ok(())
-            } else {
-                Err(anyhow!(
-                    "Failed to set version (cargo-edit exit code: {exit_status}): {stderr}"
-                ))
-            }
+    let mut stderr = String::new();
+    child.stderr.as_mut().ok_or(anyhow!("failed to unwrap stderr"))?.read_to_string(&mut stderr)?;
+
+    return Ok(CommandResult {
+        stdout,
+        stderr,
+        exit_status,
+    });
+}
+
+fn returned_zero_or_error<E>(create_error: E) -> impl Fn(CommandResult) -> anyhow::Result<CommandResult>
+where
+    E: Fn(CommandResult) -> anyhow::Error
+{
+    move |result| {
+        if result.exit_status.success() {
+            Ok(result)
+        } else {
+            Err(create_error(result))
         }
-        Err(err) => Err(anyhow!("Failed to update Cargo version: {err}")),
     }
 }
