@@ -1,6 +1,5 @@
-use std::process;
-
 use clap::{Parser, Subcommand};
+use std::process;
 
 use config::{Config, Location};
 use Location::{Cargo, StringPattern};
@@ -33,56 +32,80 @@ fn main() {
     }
 }
 
+enum Event {
+    Errored(String),
+    UpdateStarted(usize, String),
+    UpdateSucceeded(usize),
+    UpdateFailed(usize, String),
+}
+
 fn update_command(version: &str) {
     const CONFIG_FILE: &str = "versioned-files.yml";
 
-    match Config::from_file(CONFIG_FILE) {
-        Ok(config) => {
-            for location in &*config.locations {
-                match update_location(version, location) {
-                    Ok(()) => {}
-                    Err(err) => {
-                        println!("ERROR: {err}");
-                        process::exit(1);
-                    }
-                }
+    let events: Vec<Event> = Config::from_file(CONFIG_FILE)
+        .map(|config| {
+            config
+                .locations
+                .iter()
+                .enumerate()
+                .flat_map(|(id, location)| update_location(id, version, location))
+                .collect::<Vec<_>>()
+        })
+        .or_else(|err| Ok::<Vec<Event>, ()>(vec![Event::Errored(err.to_string())]))
+        .unwrap();
+
+    for event in events {
+        match event {
+            Event::Errored(err) => {
+                eprintln!("ERROR: {err}");
+                process::exit(1);
             }
-        }
-        Err(err) => {
-            eprintln!("ERROR: {err}");
-            process::exit(1);
+            Event::UpdateStarted(_, file) => {
+                print!("Updating {file}...");
+            }
+            Event::UpdateSucceeded(_) => {
+                println!("success");
+            }
+            Event::UpdateFailed(_, message) => {
+                println!("failed");
+                println!("ERROR: {message}");
+                process::exit(1);
+            }
         }
     }
 }
 
-fn update_location(version: &str, location: &Location) -> anyhow::Result<()> {
+fn update_location(id: usize, version: &str, location: &Location) -> Vec<Event> {
     match location {
         StringPattern(location_config) => {
-            print!("Updating {}...", location_config.file);
-            match location_types::string_pattern::replace_version_with_string_pattern(
-                location_config,
-                version,
-            ) {
+            vec![
+                Event::UpdateStarted(id, location_config.file.clone()),
+                match location_types::string_pattern::replace_version_with_string_pattern(
+                    location_config,
+                    version,
+                ) {
+                    Ok(()) => Event::UpdateSucceeded(id),
+                    Err(err) => Event::UpdateFailed(id, err.to_string()),
+                },
+            ]
+        }
+        Cargo => vec![
+            vec![Event::UpdateStarted(id, "Cargo.toml".to_string())],
+            match location_types::cargo::update_cargo_version(version) {
                 Ok(()) => {
-                    println!("success");
-                    Ok(())
+                    vec![
+                        Event::UpdateSucceeded(id),
+                        Event::UpdateStarted(id, "Cargo.lock".to_string()),
+                        Event::UpdateSucceeded(id),
+                    ]
                 }
                 Err(err) => {
-                    println!("failed");
-                    Err(err)
+                    vec![Event::UpdateFailed(id, err.to_string())]
                 }
-            }
-        }
-        Cargo => match location_types::cargo::update_cargo_version(version) {
-            Ok(()) => {
-                println!("Updating Cargo.toml...success");
-                println!("Updating Cargo.lock...success");
-                Ok(())
-            }
-            Err(err) => {
-                println!("{err}");
-                Err(err)
-            }
-        },
+            },
+        ]
+        .into_iter()
+        .flatten()
+        .collect(),
     }
 }
