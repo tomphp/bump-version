@@ -1,19 +1,19 @@
 use super::r#trait::Formatter;
-use crate::update_event::UpdateEvent;
+use crate::commands::update::Event;
 
 #[derive(Debug)]
 pub struct Plain;
 
 impl Formatter for Plain {
-    fn format_event(&mut self, event: &UpdateEvent) {
+    fn format_event(&mut self, event: &Event) {
         match event {
-            UpdateEvent::Started(_, file) => {
+            Event::Started(_, file) => {
                 print!("Updating {file}...");
             }
-            UpdateEvent::Succeeded(_) => {
+            Event::Succeeded(_) => {
                 println!("success");
             }
-            UpdateEvent::Failed(_, message) => {
+            Event::Failed(_, message) => {
                 println!("failed");
                 println!("Error: {message}");
             }

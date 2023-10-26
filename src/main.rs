@@ -25,10 +25,10 @@ use command::Command;
 
 mod app_state;
 mod command;
+mod commands;
 mod config;
 mod formatter;
 mod location_types;
-mod update_event;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]

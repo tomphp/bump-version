@@ -1,6 +1,7 @@
-use crate::formatter::Formatter;
-use crate::update_event::UpdateEvent;
 use anyhow::anyhow;
+
+use crate::commands::update::Event;
+use crate::formatter::Formatter;
 
 pub struct AppState<'a, T: Formatter> {
     error: Result<(), &'static str>,
@@ -15,8 +16,8 @@ impl<'a, T: Formatter> AppState<'a, T> {
         }
     }
 
-    pub(crate) fn update_event(&mut self, event: &UpdateEvent) {
-        if let UpdateEvent::Failed(_, _) = event {
+    pub(crate) fn update_event(&mut self, event: &Event) {
+        if let Event::Failed(_, _) = event {
             self.error = Err("There were errors when updating files");
         }
 
@@ -30,18 +31,15 @@ impl<'a, T: Formatter> AppState<'a, T> {
 
 #[cfg(test)]
 mod tests {
-
-    use crate::app_state::AppState;
-    use crate::formatter::r#trait::Formatter;
-    use crate::update_event::UpdateEvent;
+    use super::*;
 
     #[derive(Default)]
     struct TestFormatter {
-        received_events: Vec<UpdateEvent>,
+        received_events: Vec<Event>,
     }
 
     impl Formatter for TestFormatter {
-        fn format_event(&mut self, event: &UpdateEvent) {
+        fn format_event(&mut self, event: &Event) {
             self.received_events.push(event.clone());
         }
     }
@@ -59,14 +57,11 @@ mod tests {
         };
         let mut state = AppState::new(&mut formatter);
 
-        state.update_event(&UpdateEvent::Failed(1, "error".to_string()));
-        state.update_event(&UpdateEvent::Succeeded(1));
+        state.update_event(&Event::Failed(1, "error".to_string()));
+        state.update_event(&Event::Succeeded(1));
         assert_eq!(
             formatter.received_events,
-            vec![
-                UpdateEvent::Failed(1, "error".to_string()),
-                UpdateEvent::Succeeded(1),
-            ]
+            vec![Event::Failed(1, "error".to_string()), Event::Succeeded(1),]
         );
     }
 
@@ -80,8 +75,8 @@ mod tests {
     fn app_state_returns_error_when_failed_event_received() {
         let mut formatter: TestFormatter = TestFormatter::default();
         let mut state = AppState::new(&mut formatter);
-        state.update_event(&UpdateEvent::Failed(1, "error".to_string()));
-        state.update_event(&UpdateEvent::Succeeded(1));
+        state.update_event(&Event::Failed(1, "error".to_string()));
+        state.update_event(&Event::Succeeded(1));
         assert!(state.as_result().is_err());
     }
     #[test]
@@ -89,8 +84,8 @@ mod tests {
         let mut formatter: TestFormatter = TestFormatter::default();
         let mut state = AppState::new(&mut formatter);
 
-        state.update_event(&UpdateEvent::Started(1, "file".to_string()));
-        state.update_event(&UpdateEvent::Succeeded(1));
+        state.update_event(&Event::Started(1, "file".to_string()));
+        state.update_event(&Event::Succeeded(1));
         assert!(state.as_result().is_ok());
     }
 }
