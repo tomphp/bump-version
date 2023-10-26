@@ -2,6 +2,20 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## [v0.4.4](https://github.com/tomphp/versioned-files/compare/v0.4.3..v0.4.4) - 2023-10-26
+#### Bug Fixes
+- Remove duplicate output - ([28fe717](https://github.com/tomphp/versioned-files/commit/28fe717432bb35d9e4b1ce10a9e17473ada268ea)) - Tom Oram
+- Add a formatter - ([3dfc5fd](https://github.com/tomphp/versioned-files/commit/3dfc5fdda68d0ee14fe2edb0327bab3c79a3f48f)) - Billie Thompson
+#### Refactoring
+- Use UUIDs to tie events together - ([bf4fc93](https://github.com/tomphp/versioned-files/commit/bf4fc93de4b79cb3eeb686f9cc0e08ebfa80ac20)) - Tom Oram
+- Move update logic to commands::update - ([9fb1b82](https://github.com/tomphp/versioned-files/commit/9fb1b828e2bebabba4561c08494c0d3baab880b1)) - Tom Oram
+- Extract Command - ([5ac9e7b](https://github.com/tomphp/versioned-files/commit/5ac9e7b910387fc7e559b0f35f6855c5552cf14b)) - Tom Oram
+- Extract Formatter - ([c8c9138](https://github.com/tomphp/versioned-files/commit/c8c9138c49c91abbc767b580df10d6c3ac7dd5fc)) - Tom Oram
+- Move app state into own module - ([b0cecfc](https://github.com/tomphp/versioned-files/commit/b0cecfc4c5ab6d373ee87f21b4415424b55129c7)) - Billie Thompson
+- Extract app state into struct - ([22325fd](https://github.com/tomphp/versioned-files/commit/22325fdf102604aec08239d8bbbb08903b75f13b)) - Billie Thompson
+
+- - -
+
 ## [v0.4.3](https://github.com/tomphp/versioned-files/compare/v0.4.2..v0.4.3) - 2023-10-26
 #### Bug Fixes
 - Lift the process exit to main - ([5f5ac06](https://github.com/tomphp/versioned-files/commit/5f5ac063652a4d9c1364bffd49a6467163413fe0)) - Billie Thompson
