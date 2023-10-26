@@ -2,6 +2,22 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## [v0.4.3](https://github.com/tomphp/versioned-files/compare/v0.4.2..v0.4.3) - 2023-10-26
+#### Bug Fixes
+- Lift the process exit to main - ([5f5ac06](https://github.com/tomphp/versioned-files/commit/5f5ac063652a4d9c1364bffd49a6467163413fe0)) - Billie Thompson
+#### Continuous Integration
+- Use make in the pipeline - ([4b18179](https://github.com/tomphp/versioned-files/commit/4b1817902a6abbc05fa659664823ab94841ea0c1)) - Tom Oram
+- Use pinned version of versioned-files action - ([0ae7cb4](https://github.com/tomphp/versioned-files/commit/0ae7cb46d8431d015c5acaf4d4d43e6323cd472c)) - Tom Oram
+- Restructure job dependencies - ([9d26f1d](https://github.com/tomphp/versioned-files/commit/9d26f1dbe890d69a507273ed99efa4b702a4712c)) - Tom Oram
+#### Miscellaneous Chores
+- Add versioned-files.exe to .gitignore - ([d1366c0](https://github.com/tomphp/versioned-files/commit/d1366c065f24475adebd60957853ee12d995cba8)) - Tom Oram
+#### Refactoring
+- **(update-command)** Use events to display output - ([20e46bb](https://github.com/tomphp/versioned-files/commit/20e46bb6b713cb2938311907a3ee1bef9a6b96e9)) - Tom Oram
+- Formatting - ([7b21b86](https://github.com/tomphp/versioned-files/commit/7b21b8649c6bf76a3ffbf6503fecb22713762fa2)) - Billie Thompson
+- Use futures::streams - ([e9e7f18](https://github.com/tomphp/versioned-files/commit/e9e7f185528b6660e655acac17f1444e4dad2e04)) - Tom Oram
+
+- - -
+
 ## [v0.4.2](https://github.com/tomphp/versioned-files/compare/v0.4.1..v0.4.2) - 2023-10-24
 #### Bug Fixes
 - **(ci)** Use the versioned-files action to bump versions - ([40ed363](https://github.com/tomphp/versioned-files/commit/40ed36339a008d272026e9ceb0701e79d8db225c)) - Tom Oram

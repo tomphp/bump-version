@@ -1,6 +1,6 @@
 [package]
 name = "versioned-files"
-version = "0.4.2"
+version = "0.4.3"
 edition = "2021"
 description = "A tool which updates files in your project with the current version number."
 license-file = "LICENSE"
