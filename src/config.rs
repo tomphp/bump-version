@@ -4,7 +4,7 @@ use serde::Deserialize;
 use std::fs::File;
 use std::path::Path;
 
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 pub(crate) enum Location {
     #[serde(rename = "string-pattern")]
     StringPattern(location_types::string_pattern::Config),
