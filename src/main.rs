@@ -88,25 +88,9 @@ async fn update_command(version: &str) -> Result<(), anyhow::Error> {
 
     while let Some(event) = streams.next().await {
         state.update_event(&event);
-        print_event(event);
     }
 
     state.as_result()
-}
-
-fn print_event(event: UpdateEvent) {
-    match event {
-        UpdateEvent::Started(_, file) => {
-            print!("Updating {file}...");
-        }
-        UpdateEvent::Succeeded(_) => {
-            println!("success");
-        }
-        UpdateEvent::Failed(_, message) => {
-            println!("failed");
-            println!("Error: {message}");
-        }
-    }
 }
 
 fn update_location(
