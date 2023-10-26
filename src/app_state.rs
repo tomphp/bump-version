@@ -32,6 +32,7 @@ impl<'a, T: Formatter> AppState<'a, T> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use uuid::Uuid;
 
     #[derive(Default)]
     struct TestFormatter {
@@ -52,16 +53,17 @@ mod tests {
 
     #[test]
     fn app_state_will_format_events_as_they_arrive() {
+        let id = Uuid::new_v4();
         let mut formatter = TestFormatter {
             received_events: Vec::new(),
         };
         let mut state = AppState::new(&mut formatter);
 
-        state.update_event(&Event::Failed(1, "error".to_string()));
-        state.update_event(&Event::Succeeded(1));
+        state.update_event(&Event::Failed(id, "error".to_string()));
+        state.update_event(&Event::Succeeded(id));
         assert_eq!(
             formatter.received_events,
-            vec![Event::Failed(1, "error".to_string()), Event::Succeeded(1),]
+            vec![Event::Failed(id, "error".to_string()), Event::Succeeded(id),]
         );
     }
 
@@ -73,19 +75,21 @@ mod tests {
 
     #[test]
     fn app_state_returns_error_when_failed_event_received() {
+        let id = Uuid::new_v4();
         let mut formatter: TestFormatter = TestFormatter::default();
         let mut state = AppState::new(&mut formatter);
-        state.update_event(&Event::Failed(1, "error".to_string()));
-        state.update_event(&Event::Succeeded(1));
+        state.update_event(&Event::Failed(id, "error".to_string()));
+        state.update_event(&Event::Succeeded(id));
         assert!(state.as_result().is_err());
     }
     #[test]
     fn app_state_returns_ok_when_other_events_received() {
+        let id = Uuid::new_v4();
         let mut formatter: TestFormatter = TestFormatter::default();
         let mut state = AppState::new(&mut formatter);
 
-        state.update_event(&Event::Started(1, "file".to_string()));
-        state.update_event(&Event::Succeeded(1));
+        state.update_event(&Event::Started(id, "file".to_string()));
+        state.update_event(&Event::Succeeded(id));
         assert!(state.as_result().is_ok());
     }
 }
