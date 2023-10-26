@@ -1,7 +1,7 @@
 use anyhow::anyhow;
 use regex::Regex;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct Pattern(String);
 
 impl Pattern {
@@ -11,7 +11,7 @@ impl Pattern {
                 anyhow!("String pattern \"{string}\" does not contain the required {{{{version}}}} placeholder")
             );
         }
-        Ok(Pattern(string.to_owned()))
+        Ok(Self(string.to_owned()))
     }
 
     pub(crate) fn substituted_with(&self, version: &str) -> String {
@@ -31,7 +31,7 @@ mod tests {
     #[test]
     fn new_returns_instance() {
         assert_eq!(
-            Pattern::new("current version: {{version}}").unwrap(),
+            Pattern::new("current version: {{version}}").expect("Failed to create pattern"),
             Pattern("current version: {{version}}".to_owned())
         );
     }
@@ -39,7 +39,7 @@ mod tests {
     #[test]
     fn new_returns_error_when_placeholder_is_missing() {
         assert_eq!(
-            Pattern::new("missing version").unwrap_err().to_string(),
+            Pattern::new("missing version").expect_err("Expected an error").to_string(),
             "String pattern \"missing version\" does not contain the required {{version}} placeholder"
         );
     }
@@ -49,7 +49,7 @@ mod tests {
         assert_eq!(
             Pattern::new("current version: {{version}}")
                 .map(|p| p.substituted_with("1.2.3"))
-                .unwrap(),
+                .expect("Failed to substitute version"),
             "current version: 1.2.3"
         );
     }
@@ -60,7 +60,7 @@ mod tests {
             Pattern::new("current version: {{version}}")
                 .and_then(|p| p.to_regex(r"\d+\.\d+\.\d+"))
                 .map(|r| r.to_string())
-                .unwrap(),
+                .expect("Failed to convert to regex"),
             r"current version: \d+\.\d+\.\d+"
         );
     }
@@ -68,6 +68,6 @@ mod tests {
     #[test]
     fn to_regex_returns_an_error_when_version_pattern_is_an_invalid_regex() {
         let result = Pattern::new("current version: {{version}}").and_then(|p| p.to_regex(r"["));
-        assert_eq!(result.unwrap_err().to_string(), "Version pattern is not a valid regex: regex parse error:\n    current version: [\n                     ^\nerror: unclosed character class");
+        assert_eq!(result.expect_err("Failed to create pattern").to_string(), "Version pattern is not a valid regex: regex parse error:\n    current version: [\n                     ^\nerror: unclosed character class");
     }
 }

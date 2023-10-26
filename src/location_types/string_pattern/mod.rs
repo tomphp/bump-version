@@ -7,12 +7,9 @@ mod pattern;
 mod substitute_pattern;
 mod update_file;
 
-pub(crate) use config::Config;
+pub use config::Config;
 
-pub(crate) fn replace_version_with_string_pattern(
-    location_config: &Config,
-    version: &str,
-) -> anyhow::Result<()> {
+pub fn replace_version(location_config: &Config, version: &str) -> anyhow::Result<()> {
     let the_pattern = Pattern::new(&location_config.pattern)?;
 
     update_file(Path::new(&location_config.file), |contents| {

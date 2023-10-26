@@ -2,7 +2,7 @@ use anyhow::anyhow;
 use std::io::Read;
 use std::process::{Child, Command, ExitStatus, Stdio};
 
-pub(crate) fn update_cargo_version(version: &str) -> anyhow::Result<()> {
+pub fn update_cargo_version(version: &str) -> anyhow::Result<()> {
     check_cargo_is_installed()?;
     install_cargo_edit()?;
     update_version(version)?;
@@ -77,7 +77,7 @@ fn wait_for_command(mut child: Child) -> anyhow::Result<CommandResult> {
     child
         .stderr
         .as_mut()
-        .ok_or(anyhow!("failed to unwrap stderr"))?
+        .ok_or_else(|| anyhow!("failed to unwrap stderr"))?
         .read_to_string(&mut stderr)?;
 
     Ok(CommandResult {

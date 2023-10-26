@@ -1,3 +1,24 @@
+#![warn(
+    rust_2018_idioms,
+    unused,
+    rust_2021_compatibility,
+    nonstandard_style,
+    future_incompatible,
+    missing_copy_implementations,
+    missing_debug_implementations,
+    clippy::all,
+    clippy::pedantic,
+    clippy::nursery,
+    clippy::cargo,
+    clippy::unwrap_used,
+    clippy::missing_assert_message,
+    clippy::todo,
+    clippy::allow_attributes_without_reason,
+    clippy::panic,
+    clippy::panicking_unwrap,
+    clippy::panic_in_result_fn
+)]
+
 use std::pin::Pin;
 
 use anyhow::anyhow;
@@ -55,39 +76,43 @@ async fn update_command(version: &str) -> Result<(), anyhow::Error> {
     let config = Config::from_file(CONFIG_FILE);
 
     let mut streams = config.map(|config| config.locations).map(
-        |locations| -> Pin<Box<dyn Stream<Item = UpdateEvent>>> {
+        |locations| -> Pin<Box<dyn Stream<Item = UpdateEvent> + Send>> {
             Box::pin(futures::stream::select_all(locations.into_iter().map(
                 |location| update_location(1, version.to_string(), location),
             )))
         },
     )?;
 
-    let mut result = Ok(());
+    let mut state = AppState::new();
 
     while let Some(event) = streams.next().await {
-        match event {
-            UpdateEvent::Started(_, file) => {
-                print!("Updating {file}...");
-            }
-            UpdateEvent::Succeeded(_) => {
-                println!("success");
-            }
-            UpdateEvent::Failed(_, message) => {
-                println!("failed");
-                println!("Error: {message}");
-                result = Err(anyhow!(message));
-            }
-        }
+        state.update_event(&event);
+        print_event(event);
     }
 
-    result
+    state.as_result()
+}
+
+fn print_event(event: UpdateEvent) {
+    match event {
+        UpdateEvent::Started(_, file) => {
+            print!("Updating {file}...");
+        }
+        UpdateEvent::Succeeded(_) => {
+            println!("success");
+        }
+        UpdateEvent::Failed(_, message) => {
+            println!("failed");
+            println!("Error: {message}");
+        }
+    }
 }
 
 fn update_location(
     id: usize,
     version: String,
     location: Location,
-) -> Pin<Box<dyn Stream<Item = UpdateEvent>>> {
+) -> Pin<Box<dyn Stream<Item = UpdateEvent> + Send>> {
     match location {
         StringPattern(location_config) => {
             Box::pin(update_string_pattern_location(id, version, location_config))
@@ -119,12 +144,58 @@ fn update_string_pattern_location(
 ) -> impl Stream<Item = UpdateEvent> {
     stream! {
         yield UpdateEvent::Started(id, location_config.file.clone());
-        match location_types::string_pattern::replace_version_with_string_pattern(
+        match location_types::string_pattern::replace_version(
             &location_config,
             &version,
         ) {
             Ok(()) => yield UpdateEvent::Succeeded(id),
             Err(err) => yield UpdateEvent::Failed(id, err.to_string()),
         }
+    }
+}
+
+struct AppState {
+    error: Result<(), &'static str>,
+}
+
+impl AppState {
+    const fn new() -> Self {
+        Self { error: Ok(()) }
+    }
+
+    pub(crate) fn update_event(&mut self, event: &UpdateEvent) {
+        if let UpdateEvent::Failed(_, _) = event {
+            self.error = Err("There were errors when updating files");
+        }
+    }
+
+    fn as_result(&self) -> Result<(), anyhow::Error> {
+        self.error.map_err(|message| anyhow!(message))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn app_state_returns_ok_when_no_events() {
+        assert!(AppState::new().as_result().is_ok());
+    }
+
+    #[test]
+    fn app_state_returns_error_when_failed_event_received() {
+        let mut state = AppState::new();
+        state.update_event(&UpdateEvent::Failed(1, "error".to_string()));
+        state.update_event(&UpdateEvent::Succeeded(1));
+        assert!(state.as_result().is_err());
+    }
+    #[test]
+    fn app_state_returns_ok_when_other_events_received() {
+        let mut state = AppState::new();
+
+        state.update_event(&UpdateEvent::Started(1, "file".to_string()));
+        state.update_event(&UpdateEvent::Succeeded(1));
+        assert!(state.as_result().is_ok());
     }
 }

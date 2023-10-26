@@ -4,16 +4,16 @@ use serde::Deserialize;
 use std::fs::File;
 use std::path::Path;
 
-#[derive(Debug, Deserialize, PartialEq, Clone)]
-pub(crate) enum Location {
+#[derive(Debug, Deserialize, Eq, PartialEq, Clone)]
+pub enum Location {
     #[serde(rename = "string-pattern")]
     StringPattern(location_types::string_pattern::Config),
     #[serde(rename = "cargo")]
     Cargo,
 }
 
-#[derive(Debug, Deserialize, PartialEq)]
-pub(crate) struct Config {
+#[derive(Debug, Deserialize, Eq, PartialEq)]
+pub struct Config {
     pub(crate) locations: Vec<Location>,
 }
 
@@ -28,7 +28,7 @@ impl Config {
 fn check_file_exists(path: &str) -> anyhow::Result<&str> {
     Some(path)
         .filter(|p| Path::new(p).exists())
-        .ok_or(anyhow!("No {path} file found."))
+        .ok_or_else(|| anyhow!("No {path} file found."))
 }
 
 fn open_file(path: &str) -> anyhow::Result<File> {

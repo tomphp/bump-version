@@ -73,7 +73,7 @@ mod tests {
             std::borrow::ToOwned::to_owned,
         );
         assert_eq!(
-            result.unwrap_err().to_string(),
+            result.expect_err("Was ok").to_string(),
             "Failed to update this-file-does-not-exist.txt: File does not exist"
         );
     }
