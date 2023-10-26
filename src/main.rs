@@ -53,10 +53,10 @@ async fn update_command(version: &str) {
     let config = Config::from_file(CONFIG_FILE);
 
     let mut streams = config.map(|config| config.locations).map_or_else(
-        |err: anyhow::Error| -> Pin<Box<dyn Stream<Item=Event>>> {
+        |err: anyhow::Error| -> Pin<Box<dyn Stream<Item = Event>>> {
             Box::pin(stream! { yield Event::Errored(err.to_string()) })
         },
-        |locations| -> Pin<Box<dyn Stream<Item=Event>>> {
+        |locations| -> Pin<Box<dyn Stream<Item = Event>>> {
             Box::pin(futures::stream::select_all(locations.into_iter().map(
                 |location| update_location(1, version.to_string(), location),
             )))
@@ -88,7 +88,7 @@ fn update_location(
     id: usize,
     version: String,
     location: Location,
-) -> Pin<Box<dyn Stream<Item=Event>>> {
+) -> Pin<Box<dyn Stream<Item = Event>>> {
     match location {
         StringPattern(location_config) => {
             Box::pin(update_string_pattern_location(id, version, location_config))
@@ -97,7 +97,7 @@ fn update_location(
     }
 }
 
-fn update_cargo_location(id: usize, version: String) -> impl Stream<Item=Event> {
+fn update_cargo_location(id: usize, version: String) -> impl Stream<Item = Event> {
     stream! {
         yield Event::UpdateStarted(id, "Cargo.toml".to_string());
         match location_types::cargo::update_cargo_version(&version) {
@@ -117,7 +117,7 @@ fn update_string_pattern_location(
     id: usize,
     version: String,
     location_config: location_types::string_pattern::Config,
-) -> impl Stream<Item=Event> {
+) -> impl Stream<Item = Event> {
     stream! {
         yield Event::UpdateStarted(id, location_config.file.clone());
         match location_types::string_pattern::replace_version_with_string_pattern(
