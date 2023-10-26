@@ -120,5 +120,5 @@ versioned-files update 1.2.3
 Then you will see the following error:
 
 ```text, verify(stream=stderr)
-ERROR: No versioned-files.yml file found.
+Error: No versioned-files.yml file found.
 ```

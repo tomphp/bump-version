@@ -14,7 +14,7 @@ locations:
 versioned-files update 1.2.3
 ```
 ```shell, verify(stream=stderr)
-ERROR: Invalid config file schema: locations: unknown variant `this-type-does-not-exist`, expected `string-pattern` or `cargo` at line 2 column 3
+Error: Invalid config file schema: locations: unknown variant `this-type-does-not-exist`, expected `string-pattern` or `cargo` at line 2 column 3
 ```
 
 #### Location file does not exist
@@ -30,7 +30,7 @@ versioned-files update 1.2.3
 ```
 ```shell, verify()
 Updating this-file-does-not-exist.txt...failed
-ERROR: Failed to update this-file-does-not-exist.txt: File does not exist
+Error: Failed to update this-file-does-not-exist.txt: File does not exist
 ```
 
 #### Pattern does not contain `{{version}}` placeholder
@@ -49,5 +49,5 @@ versioned-files update 1.2.3
 ```
 ```shell, verify()
 Updating file.txt...failed
-ERROR: String pattern "This pattern does not contain a placeholder" does not contain the required {{version}} placeholder
+Error: String pattern "This pattern does not contain a placeholder" does not contain the required {{version}} placeholder
 ```
