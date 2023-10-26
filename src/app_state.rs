@@ -1,4 +1,5 @@
-use crate::{Formatter, UpdateEvent};
+use crate::formatter::Formatter;
+use crate::update_event::UpdateEvent;
 use anyhow::anyhow;
 
 pub struct AppState<'a, T: Formatter> {
@@ -31,7 +32,8 @@ impl<'a, T: Formatter> AppState<'a, T> {
 mod tests {
 
     use crate::app_state::AppState;
-    use crate::{Formatter, UpdateEvent};
+    use crate::formatter::r#trait::Formatter;
+    use crate::update_event::UpdateEvent;
 
     #[derive(Default)]
     struct TestFormatter {

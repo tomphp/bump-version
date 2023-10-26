@@ -27,13 +27,17 @@ use clap::{Parser, Subcommand};
 use futures::{Stream, StreamExt};
 
 use config::Location;
+use formatter::plain::Plain;
+use update_event::UpdateEvent;
 use Location::{Cargo, StringPattern};
 
 use crate::config::Config;
 
 mod app_state;
 mod config;
+mod formatter;
 mod location_types;
+mod update_event;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -63,13 +67,6 @@ async fn main() -> Result<(), anyhow::Error> {
     Ok(())
 }
 
-#[derive(Debug, Clone, Eq, PartialEq)]
-pub enum UpdateEvent {
-    Started(usize, String),
-    Succeeded(usize),
-    Failed(usize, String),
-}
-
 async fn update_command(version: &str) -> Result<(), anyhow::Error> {
     const CONFIG_FILE: &str = "versioned-files.yml";
 
@@ -83,7 +80,7 @@ async fn update_command(version: &str) -> Result<(), anyhow::Error> {
         },
     )?;
 
-    let mut formatter = PlainFormatter {};
+    let mut formatter = Plain {};
     let mut state = AppState::new(&mut formatter);
 
     while let Some(event) = streams.next().await {
@@ -135,30 +132,6 @@ fn update_string_pattern_location(
         ) {
             Ok(()) => yield UpdateEvent::Succeeded(id),
             Err(err) => yield UpdateEvent::Failed(id, err.to_string()),
-        }
-    }
-}
-
-pub trait Formatter {
-    fn format_event(&mut self, event: &UpdateEvent);
-}
-
-#[derive(Debug)]
-struct PlainFormatter;
-
-impl Formatter for PlainFormatter {
-    fn format_event(&mut self, event: &UpdateEvent) {
-        match event {
-            UpdateEvent::Started(_, file) => {
-                print!("Updating {file}...");
-            }
-            UpdateEvent::Succeeded(_) => {
-                println!("success");
-            }
-            UpdateEvent::Failed(_, message) => {
-                println!("failed");
-                println!("Error: {message}");
-            }
         }
     }
 }

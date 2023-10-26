@@ -1,4 +1,4 @@
-use crate::location_types::string_pattern::pattern::Pattern;
+use super::pattern::Pattern;
 
 pub fn substitute_pattern(
     pattern: &Pattern,
