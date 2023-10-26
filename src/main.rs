@@ -63,8 +63,8 @@ async fn main() -> Result<(), anyhow::Error> {
     Ok(())
 }
 
-#[derive(Debug)]
-enum UpdateEvent {
+#[derive(Debug, Clone, Eq, PartialEq)]
+pub enum UpdateEvent {
     Started(usize, String),
     Succeeded(usize),
     Failed(usize, String),
@@ -83,7 +83,8 @@ async fn update_command(version: &str) -> Result<(), anyhow::Error> {
         },
     )?;
 
-    let mut state = AppState::new();
+    let mut formatter = PlainFormatter {};
+    let mut state = AppState::new(&mut formatter);
 
     while let Some(event) = streams.next().await {
         state.update_event(&event);
@@ -150,6 +151,30 @@ fn update_string_pattern_location(
         ) {
             Ok(()) => yield UpdateEvent::Succeeded(id),
             Err(err) => yield UpdateEvent::Failed(id, err.to_string()),
+        }
+    }
+}
+
+pub trait Formatter {
+    fn format_event(&mut self, event: &UpdateEvent);
+}
+
+#[derive(Debug)]
+struct PlainFormatter;
+
+impl Formatter for PlainFormatter {
+    fn format_event(&mut self, event: &UpdateEvent) {
+        match event {
+            UpdateEvent::Started(_, file) => {
+                print!("Updating {file}...");
+            }
+            UpdateEvent::Succeeded(_) => {
+                println!("success");
+            }
+            UpdateEvent::Failed(_, message) => {
+                println!("failed");
+                println!("Error: {message}");
+            }
         }
     }
 }
