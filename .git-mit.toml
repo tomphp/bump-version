@@ -1,0 +1,7 @@
+[mit.lint]
+body-wider-than-72-characters = true
+duplicated-trailers = true
+not-conventional-commit = true
+subject-line-not-capitalized = false
+subject-longer-than-72-characters = true
+subject-not-separated-from-body = true
