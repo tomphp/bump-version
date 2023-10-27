@@ -9,15 +9,16 @@ use futures::{Stream, StreamExt};
 use std::pin::Pin;
 use uuid::Uuid;
 
-pub struct Command<'a, F: Formatter + Send> {
-    formatter: &'a mut F,
+pub struct Command<'a, F: Formatter> {
+    formatter: &'a F,
 }
-impl<'a, F: Formatter + Send> Command<'a, F> {
-    pub fn new(formatter: &'a mut F) -> Self {
+
+impl<'a, F: Formatter + Send + Sync> Command<'a, F> {
+    pub const fn new(formatter: &'a F) -> Self {
         Command { formatter }
     }
 
-    pub async fn execute(&mut self, version: &str) -> Result<(), anyhow::Error> {
+    pub async fn execute(&self, version: &str) -> Result<(), anyhow::Error> {
         const CONFIG_FILE: &str = "versioned-files.yml";
 
         let config = Config::from_file(CONFIG_FILE);

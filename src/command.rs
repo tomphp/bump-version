@@ -15,8 +15,8 @@ impl Command {
     pub(crate) async fn execute(&self) -> Result<(), anyhow::Error> {
         match self {
             Self::Update { version } => {
-                let mut formatter = Plain {};
-                crate::commands::update::Command::new(&mut formatter)
+                let formatter = Plain::new();
+                crate::commands::update::Command::new(&formatter)
                     .execute(version)
                     .await?;
             }
