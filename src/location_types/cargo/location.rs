@@ -3,10 +3,9 @@ use std::process::{Child, Command, ExitStatus, Stdio};
 
 use anyhow::anyhow;
 use async_stream::stream;
-use uuid::Uuid;
 
 use crate::commands::update;
-use crate::commands::update::Updater;
+use crate::commands::update::{LifeCycle, Updater};
 
 pub struct Location;
 
@@ -19,17 +18,17 @@ impl Location {
 impl Updater for Location {
     fn update(&self, version: String) -> update::EventStream {
         Box::pin(stream! {
-            let toml_id = Uuid::new_v4();
-            let lock_id = Uuid::new_v4();
-            yield update::Event::Started(toml_id, "Cargo.toml".to_string());
+            let toml_life_cycle = LifeCycle::new("Cargo.toml");
+            yield toml_life_cycle.start();
             match update_cargo_version(&version) {
                 Ok(()) => {
-                  yield update::Event::Succeeded(toml_id);
-                  yield update::Event::Started(lock_id, "Cargo.lock".to_string());
-                  yield update::Event::Succeeded(lock_id);
+                  yield toml_life_cycle.succeed();
+                  let lock_life_cycle = LifeCycle::new("Cargo.lock");
+                  yield lock_life_cycle.start();
+                  yield lock_life_cycle.succeed();
                 }
                 Err(err) => {
-                    yield update::Event::Failed(toml_id, err.to_string());
+                    yield toml_life_cycle.fail(&err.to_string())
                 }
             }
         })

@@ -1,9 +1,8 @@
 use std::path::Path;
 
 use async_stream::stream;
-use uuid::Uuid;
 
-use crate::commands::update::{Event, EventStream, Updater};
+use crate::commands::update::{EventStream, LifeCycle, Updater};
 
 use super::config::Config;
 use super::pattern::Pattern;
@@ -25,11 +24,11 @@ impl Updater for Location {
         let config = self.config.clone();
 
         Box::pin(stream! {
-            let id = Uuid::new_v4();
-            yield Event::Started(id, config.file.clone());
+            let life_cycle = LifeCycle::new(&config.file);
+            yield life_cycle.start();
             match replace_version(&config, &version) {
-                Ok(()) => yield Event::Succeeded(id),
-                Err(err) => yield Event::Failed(id, err.to_string()),
+                Ok(()) => yield life_cycle.succeed(),
+                Err(err) => yield life_cycle.fail(&err.to_string()),
             }
         })
     }
