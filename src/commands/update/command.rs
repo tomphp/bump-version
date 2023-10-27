@@ -2,36 +2,44 @@ use super::event::Event;
 use super::state::State;
 use crate::config::Location::{Cargo, StringPattern};
 use crate::config::{Config, Location};
-use crate::formatter::plain::Plain;
+use crate::formatter::Formatter;
 use crate::location_types;
 use async_stream::stream;
 use futures::{Stream, StreamExt};
 use std::pin::Pin;
 use uuid::Uuid;
 
-pub async fn execute(version: &str) -> Result<(), anyhow::Error> {
-    const CONFIG_FILE: &str = "versioned-files.yml";
-
-    let config = Config::from_file(CONFIG_FILE);
-
-    let mut streams = config.map(|config| config.locations).map(
-        |locations| -> Pin<Box<dyn Stream<Item = Event> + Send>> {
-            Box::pin(futures::stream::select_all(
-                locations
-                    .into_iter()
-                    .map(|location| update_location(version.to_string(), location)),
-            ))
-        },
-    )?;
-
-    let mut formatter = Plain {};
-    let mut state = State::new(&mut formatter);
-
-    while let Some(event) = streams.next().await {
-        state.update_event(&event);
+pub struct Command<'a, F: Formatter + Send> {
+    formatter: &'a mut F,
+}
+impl<'a, F: Formatter + Send> Command<'a, F> {
+    pub fn new(formatter: &'a mut F) -> Self {
+        Command { formatter }
     }
 
-    state.as_result()
+    pub async fn execute(&mut self, version: &str) -> Result<(), anyhow::Error> {
+        const CONFIG_FILE: &str = "versioned-files.yml";
+
+        let config = Config::from_file(CONFIG_FILE);
+
+        let mut streams = config.map(|config| config.locations).map(
+            |locations| -> Pin<Box<dyn Stream<Item = Event> + Send>> {
+                Box::pin(futures::stream::select_all(
+                    locations
+                        .into_iter()
+                        .map(|location| update_location(version.to_string(), location)),
+                ))
+            },
+        )?;
+
+        let mut state = State::new(self.formatter);
+
+        while let Some(event) = streams.next().await {
+            state.update_event(&event);
+        }
+
+        state.as_result()
+    }
 }
 
 fn update_location(

@@ -1,3 +1,4 @@
+use crate::formatter::plain::Plain;
 use clap::Subcommand;
 
 #[derive(Subcommand)]
@@ -13,7 +14,12 @@ pub enum Command {
 impl Command {
     pub(crate) async fn execute(&self) -> Result<(), anyhow::Error> {
         match self {
-            Self::Update { version } => crate::commands::update::command::execute(version).await?,
+            Self::Update { version } => {
+                let mut formatter = Plain {};
+                crate::commands::update::Command::new(&mut formatter)
+                    .execute(version)
+                    .await?;
+            }
         }
 
         Ok(())
