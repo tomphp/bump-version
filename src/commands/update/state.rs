@@ -3,12 +3,12 @@ use anyhow::anyhow;
 use crate::commands::update::Event;
 use crate::formatter::Formatter;
 
-pub struct AppState<'a, T: Formatter> {
+pub struct State<'a, T: Formatter> {
     error: Result<(), &'static str>,
     formatter: &'a mut T,
 }
 
-impl<'a, T: Formatter> AppState<'a, T> {
+impl<'a, T: Formatter> State<'a, T> {
     pub fn new(formatter: &'a mut T) -> Self {
         Self {
             error: Ok(()),
@@ -48,7 +48,7 @@ mod tests {
     #[test]
     fn app_state_has_a_default_formatter() {
         let mut formatter: TestFormatter = TestFormatter::default();
-        assert!(AppState::new(&mut formatter).as_result().is_ok());
+        assert!(State::new(&mut formatter).as_result().is_ok());
     }
 
     #[test]
@@ -57,7 +57,7 @@ mod tests {
         let mut formatter = TestFormatter {
             received_events: Vec::new(),
         };
-        let mut state = AppState::new(&mut formatter);
+        let mut state = State::new(&mut formatter);
 
         state.update_event(&Event::Failed(id, "error".to_string()));
         state.update_event(&Event::Succeeded(id));
@@ -70,14 +70,14 @@ mod tests {
     #[test]
     fn app_state_returns_ok_when_no_events() {
         let mut formatter: TestFormatter = TestFormatter::default();
-        assert!(AppState::new(&mut formatter).as_result().is_ok());
+        assert!(State::new(&mut formatter).as_result().is_ok());
     }
 
     #[test]
     fn app_state_returns_error_when_failed_event_received() {
         let id = Uuid::new_v4();
         let mut formatter: TestFormatter = TestFormatter::default();
-        let mut state = AppState::new(&mut formatter);
+        let mut state = State::new(&mut formatter);
         state.update_event(&Event::Failed(id, "error".to_string()));
         state.update_event(&Event::Succeeded(id));
         assert!(state.as_result().is_err());
@@ -86,7 +86,7 @@ mod tests {
     fn app_state_returns_ok_when_other_events_received() {
         let id = Uuid::new_v4();
         let mut formatter: TestFormatter = TestFormatter::default();
-        let mut state = AppState::new(&mut formatter);
+        let mut state = State::new(&mut formatter);
 
         state.update_event(&Event::Started(id, "file".to_string()));
         state.update_event(&Event::Succeeded(id));

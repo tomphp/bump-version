@@ -1,5 +1,5 @@
 use super::event::Event;
-use crate::app_state::AppState;
+use super::state::State;
 use crate::config::Location::{Cargo, StringPattern};
 use crate::config::{Config, Location};
 use crate::formatter::plain::Plain;
@@ -25,7 +25,7 @@ pub async fn execute(version: &str) -> Result<(), anyhow::Error> {
     )?;
 
     let mut formatter = Plain {};
-    let mut state = AppState::new(&mut formatter);
+    let mut state = State::new(&mut formatter);
 
     while let Some(event) = streams.next().await {
         state.update_event(&event);

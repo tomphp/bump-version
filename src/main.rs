@@ -23,7 +23,6 @@ use clap::Parser;
 
 use command::Command;
 
-mod app_state;
 mod command;
 mod commands;
 mod config;
