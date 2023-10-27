@@ -1,13 +1,15 @@
-use super::event::Event;
-use super::state::State;
+use async_stream::stream;
+use futures::StreamExt;
+use uuid::Uuid;
+
 use crate::config::Location::{Cargo, StringPattern};
 use crate::config::{Config, Location};
 use crate::formatter::Formatter;
 use crate::location_types;
-use async_stream::stream;
-use futures::{Stream, StreamExt};
-use std::pin::Pin;
-use uuid::Uuid;
+
+use super::event;
+use super::event::Event;
+use super::state::State;
 
 pub struct Command<'a, F: Formatter> {
     formatter: &'a F,
@@ -23,15 +25,16 @@ impl<'a, F: Formatter + Send + Sync> Command<'a, F> {
 
         let config = Config::from_file(CONFIG_FILE);
 
-        let mut streams = config.map(|config| config.locations).map(
-            |locations| -> Pin<Box<dyn Stream<Item = Event> + Send>> {
-                Box::pin(futures::stream::select_all(
-                    locations
-                        .into_iter()
-                        .map(|location| update_location(version.to_string(), location)),
-                ))
-            },
-        )?;
+        let mut streams =
+            config
+                .map(|config| config.locations)
+                .map(|locations| -> event::Stream {
+                    Box::pin(futures::stream::select_all(
+                        locations
+                            .into_iter()
+                            .map(|location| update_location(version.to_string(), location)),
+                    ))
+                })?;
 
         let mut state = State::new(self.formatter);
 
@@ -43,20 +46,15 @@ impl<'a, F: Formatter + Send + Sync> Command<'a, F> {
     }
 }
 
-fn update_location(
-    version: String,
-    location: Location,
-) -> Pin<Box<dyn Stream<Item = Event> + Send>> {
+fn update_location(version: String, location: Location) -> event::Stream {
     match location {
-        StringPattern(location_config) => {
-            Box::pin(update_string_pattern_location(version, location_config))
-        }
-        Cargo => Box::pin(update_cargo_location(version)),
+        StringPattern(location_config) => update_string_pattern_location(version, location_config),
+        Cargo => update_cargo_location(version),
     }
 }
 
-fn update_cargo_location(version: String) -> impl Stream<Item = Event> {
-    stream! {
+fn update_cargo_location(version: String) -> event::Stream {
+    Box::pin(stream! {
         let toml_id = Uuid::new_v4();
         let lock_id = Uuid::new_v4();
         yield Event::Started(toml_id, "Cargo.toml".to_string());
@@ -70,14 +68,14 @@ fn update_cargo_location(version: String) -> impl Stream<Item = Event> {
                 yield Event::Failed(toml_id, err.to_string());
             }
         }
-    }
+    })
 }
 
 fn update_string_pattern_location(
     version: String,
     location_config: location_types::string_pattern::Config,
-) -> impl Stream<Item = Event> {
-    stream! {
+) -> event::Stream {
+    Box::pin(stream! {
         let id = Uuid::new_v4();
         yield Event::Started(id, location_config.file.clone());
         match location_types::string_pattern::replace_version(
@@ -87,5 +85,5 @@ fn update_string_pattern_location(
             Ok(()) => yield Event::Succeeded(id),
             Err(err) => yield Event::Failed(id, err.to_string()),
         }
-    }
+    })
 }
