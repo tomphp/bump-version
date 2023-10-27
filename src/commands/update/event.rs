@@ -8,4 +8,4 @@ pub enum Event {
     Failed(Uuid, String),
 }
 
-pub type Stream = Pin<Box<dyn futures::Stream<Item = Event> + Send>>;
+pub type Stream = Pin<Box<dyn futures::Stream<Item = Event> + Send + 'static>>;
